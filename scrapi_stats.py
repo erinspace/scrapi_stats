@@ -1,22 +1,14 @@
-
-# coding: utf-8
-
-# In[1]:
-
 import copy
 import json
 import logging
 import requests
 import datetime
 
+import settings
 
-# In[2]:
 
 OSF_APP_URL = 'https://share-dev.osf.io/api/v1/app/6qajn/'
-OSF_AUTH = ('scrapi_stats','543edf86b5e9d7579327c710eb1d94ee-d8da-472a-84bb-ba6b96499c80')
-
-
-# In[3]:
+OSF_AUTH = settings.OSF_AUTH
 
 DEFAULT_PARAMS = {
     'q': '*',
@@ -30,8 +22,6 @@ DEFAULT_PARAMS = {
 }
 
 
-# In[4]:
-
 def query_osf(query):
     headers = {'Content-Type': 'application/json'}
     data = json.dumps(query)
@@ -39,8 +29,6 @@ def query_osf(query):
     print(data)
     return requests.post(OSF_APP_URL, auth=OSF_AUTH, headers=headers, data=data, verify=False).json()
 
-
-# In[5]:
 
 def search(raw_params):
     params = copy.deepcopy(DEFAULT_PARAMS)
@@ -56,7 +44,6 @@ def search(raw_params):
     return query_osf(query)
 
 
-# In[6]:
 
 def parse_query(params):
     return {
@@ -71,8 +58,6 @@ def parse_query(params):
     }
 
 
-# In[7]:
-
 def build_query(q, start_date, end_date):
     return {
         'filtered': {
@@ -81,8 +66,6 @@ def build_query(q, start_date, end_date):
         }
     }
 
-
-# In[8]:
 
 def build_query_string(q):
     return {
@@ -95,8 +78,6 @@ def build_query_string(q):
     }
 
 
-# In[9]:
-
 def build_date_filter(start_date, end_date):
     return {
         'range': {
@@ -107,9 +88,6 @@ def build_date_filter(start_date, end_date):
         }
     }
 
-
-# In[10]:
-
 def build_sort(sort_field, sort_type):
     print sort_field
     return [{
@@ -118,18 +96,8 @@ def build_sort(sort_field, sort_type):
         }
     }]
 
-
-# In[13]:
-
 all_results = search({'size': 1000})
 
-
-# In[11]:
-import pdb; pdb.set_trace()
-
-# print(results)
-
-# In[11]:
 
 
 
