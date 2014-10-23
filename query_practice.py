@@ -24,12 +24,12 @@ DEFAULT_REQUEST_PARAMS = {
 }
 
 # Local settings
-OSF_APP_URL = 'http://localhost:5000/api/v1/app/kb7ae/?return_raw=True'
-OSF_AUTH = ('scrapi', '54331d5a669aec8577089ad1e4b9dcb3-50f3-4828-9232-d85512a999e7')
+# OSF_APP_URL = 'http://localhost:5000/api/v1/app/kb7ae/?return_raw=True'
+# OSF_AUTH = ('scrapi', '54331d5a669aec8577089ad1e4b9dcb3-50f3-4828-9232-d85512a999e7')
 
 # share-dev settings
-# OSF_APP_URL = 'https://share-dev.osf.io/api/v1/app/6qajn/'
-# OSF_AUTH = ('scrapi_stats','543edf86b5e9d7579327c710eb1d94ee-d8da-472a-84bb-ba6b96499c80')
+OSF_APP_URL = 'https://share-dev.osf.io/api/v1/app/6qajn/?return_raw=True'
+OSF_AUTH = ('scrapi_stats','543edf86b5e9d7579327c710eb1d94ee-d8da-472a-84bb-ba6b96499c80')
 
 def query_osf(query, raw_query_params, request_params):
     headers = {'Content-Type': 'application/json'}
@@ -49,16 +49,23 @@ def search(request_params, raw_query_params):
     for key in params.keys():
         if isinstance(params[key], list) and len(params[key]) == 1:
             params[key] = params[key][0]
-    query = create_test_agg_query()
+    query = create_test_nested_agg_query()
     osf_query = query_osf(query, raw_query_params, request_params)
     return osf_query
 
-
-
-def create_test_agg_query():
+def create_simple_agg_query():
     return {
         "size" : 0,
-        # "return_raw": True,
+        "aggs": {
+            "sources" : {
+                "terms" : {"field": "source"}
+            }
+        }
+    }
+
+def create_test_nested_agg_query():
+    return {
+        "size" : 0,
         "aggs": {
             "sourceAggregation": {
                 "filter" : {
@@ -74,6 +81,8 @@ def create_test_agg_query():
 
         }
     }
+
+
 
 
 search_osf = search(request_params={'return_raw': True}, raw_query_params={})
