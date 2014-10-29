@@ -3,322 +3,427 @@
 
 # #SHARE Results
 # ----
-# Here are some working examples of how to query the current scrAPI database for metrics of results coming through the SHARE Notifiation Service.  
+# Here are some working examples of how to query the current scrAPI database for metrics of results coming through the SHARE Notifiation Service.
+# 
+# These particular queries are just examples, and the data is open for anyone to use, so feel free to make your own and experiment!
 # 
 # ----
 # 
 
+# ### Service Names for Reference
+# ----
+# Each provider harvested from uses a shortened name for its source. Here's a guide to which short names refer to which services
+# 
+
+# <table>
+#     <tr>
+#         <td> arxiv_oai </td>
+#         <td> ArXiv </td>
+#     </tr>
+#     <tr>
+#         <td> calpoly </td>
+#         <td> Digital Commons at Cal Poly </td>
+#     </tr>
+#     <tr>
+#         <td> clinicaltrials </td>
+#         <td> ClinicalTrials.gov </td>
+#     </tr>    
+#     <tr>
+#         <td> crossref </td>
+#         <td> CrossRef </td>
+#     </tr>
+#     <tr>
+#         <td> doepages </td>
+#         <td> Department of Energy Pages </td>
+#     </tr>
+# 
+#     <tr>
+#         <td> cmu </td>
+#         <td> Carnegie Mellon University Research Showcase </td>
+#     </tr>
+#     <tr>
+#         <td> columbia  </td>
+#         <td> Columbia Adacemic Commons </td>
+#     </tr>
+#     <tr>
+#         <td> dataone </td>
+#         <td> DataONE: Data Observation Network for Earth </td>
+#     </tr>
+#     <tr>
+#         <td> mit </td>
+#         <td> DSpace@MIT </td>
+#     </tr>
+#     <tr>
+#         <td> opensiuc </td>
+#         <td> OpenSIUC at the Southern Illinois University Carbondale </td>
+#     </tr>
+#     <tr>
+#         <td> plos </td>
+#         <td> Public Library Of Science </td>
+#     </tr>
+#     <tr>
+#         <td> scitech </td>
+#         <td> SciTech Connect </td>
+#     </tr>
+#     <tr>
+#         <td> stcloud </td>
+#         <td> theRepository at St. Cloud State </td>
+#     </tr>
+#     <tr>
+#         <td> uceschol </td>
+#         <td> California Digital Library eScholarship System </td>
+#     </tr>
+#     <tr>
+#         <td> uiucideals </td>
+#         <td> University of Illinois at Urbana-Champaign Illinois Digital Enviornment for Access to Learning and Scholarship </td>
+#     </tr>
+#     <tr>
+#         <td> upenn </td>
+#         <td> University of Pennsylvania Scholarly Commons </td>
+#     </tr>
+#     <tr>
+#         <td> utaustin </td>
+#         <td> University of Texas Digital Repository </td>
+#     </tr>
+#     <tr>
+#         <td> uwdspace </td>
+#         <td> ResearchWorks at the University of Washington </td>
+#     </tr>
+#     <tr>
+#         <td> vtechworks </td>
+#         <td> Virginia Tech VTechWorks </td>
+#     </tr>
+#     <tr>
+#         <td> wayne </td>
+#         <td> DigitalCommons@WayneState </td>
+#     </tr>
+#     
+# </table>
+
 # ##Setup: 
 
-# In[1]:
+# In[125]:
 
-from __future__ import division
-import copy
 import json
-import logging
 import requests
-import datetime
 
-# Want to eventually use pandas!
-# from pandas import DataFrame, Series
+import numpy as np
+import matplotlib.pyplot as plt
 
-
-# In[2]:
-
-OSF_APP_URL = 'https://share-dev.osf.io/api/v1/app/6qajn/'
-OSF_AUTH = ('scrapi_stats','543edf86b5e9d7579327c710eb1d94ee-d8da-472a-84bb-ba6b96499c80')
+get_ipython().magic(u'matplotlib inline')
 
 
-# In[3]:
+# In[126]:
 
-DEFAULT_PARAMS = {
-    'q': '*',
-    'start_date': None,
-    'end_date': datetime.date.today().isoformat(),
-    'sort_field': 'dateUpdated',
-    'sort_type': 'desc',
-    'from': 0,
-    'size': 10,
-    'format': 'json',
-    'empty_field': None,
-    'agg': False
-}
+# SHARE-dev settings
+# OSF_APP_URL = 'http://share-dev.osf.io/api/v1/app/6qajn/?return_raw=True'
+
+
+# In[127]:
+
+# Localhost settings - for testing
+OSF_APP_URL = 'http://localhost:5000/api/v1/app/kb7ae/?return_raw=True'
 
 
 # ## Query Setup
 
-# In[4]:
+# In[128]:
 
 def query_osf(query):
     headers = {'Content-Type': 'application/json'}
     data = json.dumps(query)
-#     import pdb; pdb.set_trace()
-    print(data)
-    return requests.post(OSF_APP_URL, auth=OSF_AUTH, headers=headers, data=data, verify=False).json()
+    return requests.post(OSF_APP_URL, headers=headers, data=data, verify=False).json()
 
 
-# In[5]:
+# In[129]:
 
-def search(raw_params):
-    params = copy.deepcopy(DEFAULT_PARAMS)
-    params.update(raw_params)
-    for key in params.keys():
-        if isinstance(params[key], list) and len(params[key]) == 1:
-            params[key] = params[key][0]
-    params['from'] = int(params['from'])
-    params['size'] = int(params['size'])
-    print params
-    query = parse_query(params)
-    query['format'] = params.get('format')
+def search(agg_type, field=None, all_results=True, exclude_terms=False):
+    if agg_type == 'field':
+        query = field_aggregation_query(field, all_results)
+    elif agg_type == 'missing':
+        query = source_missing_query(field)
+    elif agg_type == 'common_properties':
+        query = common_properties_query()
+    else: 
+        print("Not a valid agg query!")
+        return None
     return query_osf(query)
 
 
-# In[6]:
+# In[130]:
 
-def parse_query(params):
-    if params.get('agg'):
-        return {
-            'query': build_query(
-                params.get('q'),
-                params.get('start_date'),
-                params.get('end_date'),
-                params.get('empty_field'),
-                params.get('agg')
-                
-            ),
-            'sort': build_sort(params.get('sort_field'), params.get('sort_type')),
-            'from': params.get('from'),
-            'size': params.get('size'),
-            
+def field_aggregation_query(field, all_results):
+    ''' Use this basic aggregation query to find all
+    of the results from a particular field. Perhaps
+    best used for sources or tag counts '''
+    
+    return {
+        "size" : 0,
+        "aggs": {
+            "sources" : {
+                "terms" : {
+                    "field": field, 
+                    "size" : return_all(all_results),
+                    "exclude" : "of|and|or"
+                }
+            }
         }
-    else:
-        return {
-            'query': build_query(
-                params.get('q'),
-                params.get('start_date'),
-                params.get('end_date'),
-                params.get('empty_field'),
-                params.get('agg')
-            ),
-            'sort': build_sort(params.get('sort_field'), params.get('sort_type')),
-            'from': params.get('from'),
-            'size': params.get('size')
-        }
+    }
 
 
-# In[7]:
+# In[131]:
 
-def build_query(q, start_date, end_date, empty_field, agg):
-    if empty_field is not None and not agg:
-        return {
-            'filtered': {
-                'query': build_query_string(q),
-                'filter': {
-                    'bool': {
-                        'must': [
-                            build_date_filter(start_date, end_date),
-                        ],
-                        'must_not' : [
-                            build_empty_filter(empty_field)
-                        ]
+def source_missing_query(missing_field):
+    ''' Use this query to find how many documents from 
+    a particular source are missing an entry for any field '''
+    
+    return {
+        "size": 0,
+            "aggs": {
+            "sourceAggregation": {
+                "filter" : {
+                    "missing" : {"field" : missing_field}
+                },
+                "aggs" : {
+                    "sources" : {
+                        "terms" : {
+                            "field": "source",
+                            "size": 0
+                        }
                     }
                 }
-            },
-            'aggs': build_aggregation('empty_field'),
+            }
+        }
+    }
+
+
+# In[132]:
+
+def common_properties_query():
+    ''' This is totally wrong - try again with examples
+    from: https://github.com/elasticsearch/elasticsearch/issues/5789
+    and http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/mapping-field-names-field.html#mapping-field-names-field
+    '''
+    return {
+        "size": 0,
+        "aggs": {
+            "properties": {
+                "nested": {
+                    "path": "properties"
+                },
+            "aggs": {
+                "key": {
+                    "terms": {
+                        "field": "properties.key"
+                    },
+                    "aggs": {
+                        "value": {
+                            "terms": {
+                                "field": "properties.value"
+                            }
+                        }
+                    }
+                }
+            }}
+        }
+    }
+
+
+# In[133]:
+
+def return_all(all_results):
+    ''' used to determine if you want 
+    to show all of the results, or just 
+    the top 10 '''
+    
+    if all_results:
+        return 0
     else:
-        }
-        return {
-            'filtered': {
-                'query': build_query_string(q),
-                'filter': build_date_filter(start_date, end_date)
-            }
-        }
+        return 10
+    
 
 
-# In[8]:
+# ## Query Cleanup
 
-def build_query_string(q):
-    return {
-        'query_string': {
-            'default_field': '_all',
-            'query': q,
-            'analyze_wildcard': True,
-            'lenient': True  # TODO, may not want to do this
-        }
-    }
+# In[134]:
 
+def full_results_to_list(full_elastic_results):
+    ''' takes the raw elastic search results, and 
+    returns a simplified version with just a list of 
+    all the doc counts and their values '''
+    
+    try:
+        return full_elastic_results['aggregations']['sources']['buckets']
+    except KeyError:
+        return full_elastic_results['aggregations']['sourceAggregation']['sources']['buckets']
 
-# In[9]:
 
-def build_date_filter(start_date, end_date):
-    return {
-        'range': {
-            'consumeFinished': {
-                'gte': start_date,  # TODO, can be None, elasticsearch may not like it
-                'lte': end_date
-            }
-        }
-    }
+# In[135]:
 
+def extract_values_and_labels(elastic_results):
+    ''' Takes a list of dictionaries of the results of
+    an elasticsearch aggregation, and converts them into
+    two lists - of values, and labels - to be used in 
+    plotting later.
+    
+    Returns a dictionary with the lists of values and labels
+    '''
+    labels = []
+    values = []
+    for item in elastic_results:
+        labels.append(item['key'])
+        values.append(item['doc_count'])
+    
+    return {'values': values, 'labels':labels}
 
-# In[10]:
 
-def build_empty_filter(empty_field):
-    return {
-        'exists' : {
-            'field': empty_field
-        }
-    }
+# ## Functions for Making Graphs!
 
+# In[136]:
 
-# In[11]:
+def create_bar_graph(elastic_results,  x_label, title, field_for_title=''):
+    ''' takes a list of elastic results, and 
+    returns a bar graph of the doc counts'''
+    
+    values_labels = extract_values_and_labels(elastic_results)
+    values = values_labels['values']
+    labels = values_labels['labels']
+    
+    length = len(values)
+    index = np.arange(len(values))
+    width = 0.35 
+    
+    bar = plt.bar(index, values)
+    
+    plt.xticks(index+width/2, labels, rotation='vertical')
+    plt.xlabel(x_label)
+    plt.ylabel('Document Count')
+    plt.title(title + field_for_title)
 
-def build_sort(sort_field, sort_type):
-    print sort_field
-    return [{
-        sort_field : {
-            'order': sort_type
-        }
-    }]
 
+# In[137]:
 
-# For the aggregations section a little later...
+def create_pie_chart(elastic_results, title, field_for_title=''):
+    ''' takes a list of elastic results, and 
+    returns a bar graph of the doc counts.
+    Looks very messy at the moment - need to fix labels'''
+    
+    values_labels = extract_values_and_labels(elastic_results)
+    values = values_labels['values']
+    labels = values_labels['labels']
+    
+    pie = plt.pie(values, labels=labels)
+    plt.title(title + field_for_title)
 
-# In[ ]:
 
-def build_aggregation(empty_field):
-    return build_missing_aggregation(empty_field)
+# ## Exploring the SHARE Data
 
+# ###Documents per source
+# ----
+# Here are some examples of how to use the above queries to get the number of documents returned by each source
 
-# In[ ]:
+# In[138]:
 
-def build_missing_aggregation(empty_field):
-    return {
-        "results_with_missing_fields": {
-            "terms": {"field": "source"}
-    }
-}
+source_stats_search = search(agg_type='field', field='source')
 
 
-# Now we can get the Total Number of results for later calculation of percentage stats
+# In[139]:
 
-# In[12]:
+source_statistics = full_results_to_list(source_stats_search)
 
-all_results = search({})
 
+# In[140]:
 
-# In[13]:
+# print(json.dumps(source_statistics, indent=4))
 
-total_results = all_results['total']
 
+# In[141]:
 
-# In[14]:
+create_bar_graph(source_statistics, title="Documents Per Source", x_label='Source')
 
-total_results
 
+# In[142]:
 
-# Create a large dictionary from all results
+''' The labels on this need some serious fixing!!
+'''
 
-# #Building Metrics for Results with Filters
+create_pie_chart(source_statistics, "Documents Per Source")
 
-# Here are some ways we can query elasticsearch to gather some metrics, and see which fields are missing in the data we've collected so far. 
 
-# ##DOI
+# ### Number of missing fields per source
+# ----
+# These queries will find the sources that are missing a certain field. 
+# The two examples we'll give here are title and email 
 
-# In[15]:
+# In[143]:
 
-# Find all results without a DOI
-results_no_doi = search({'empty_field': 'doi'})
+missing_by_title_search = search('missing', field='title')
 
 
-# In[ ]:
+# In[144]:
 
-total_no_doi = results_no_doi['total']
+missing_by_title = full_results_to_list(missing_by_title_search)
 
 
-# ####Percentage of all results with no DOI
+# In[145]:
 
-# In[ ]:
+print(json.dumps(missing_by_title, indent=4))
 
-(total_no_doi/total_results)*100
 
+# In[146]:
 
-# DOI per source
+create_bar_graph(missing_by_title, title="Documents Missing the Field: ", field_for_title='Title', x_label="Source")
 
-# In[ ]:
 
-source_total = search({'q': 'source:dataone'})
+# In[147]:
 
+missing_by_email_search = search('missing', field='email')
 
-# In[ ]:
 
-source_total_num = source_total['total']
+# In[148]:
 
+missing_by_email = full_results_to_list(missing_by_email_search)
 
-# In[ ]:
 
-source_no_doi = search({'q': 'source:dataone', 'empty_field': 'doi'})
+# In[149]:
 
+# print(json.dumps(missing_by_email, indent=4))
 
-# In[ ]:
 
-source_no_doi_num = source_no_doi['total']
+# In[150]:
 
+create_bar_graph(missing_by_email, title="Documents Missing the Field: ", field_for_title='Email', x_label="Source")
 
-# Percentage of source with no DOI
 
-# In[ ]:
+# ##Most Popular Tags in the dataset
 
-(source_total_num/source_no_doi_num)*100
+# In[151]:
 
+top_tags_search = search(agg_type='field', field='tags', all_results=False)
 
-# ##Title
 
-# In[ ]:
+# In[152]:
 
-# Find all results without a title
-results_no_title = search({'empty_field': 'title'})
+top_tags = full_results_to_list(top_tags_search)
 
 
-# In[ ]:
+# In[153]:
 
-total_no_title = results_no_title['total']
+# print(json.dumps(top_tags, indent=4))
 
 
-# ####Percentage of results with no Title
+# In[154]:
 
-# In[ ]:
+create_bar_graph(top_tags, title="Most Frequent Tags", x_label="Tag")
 
-(total_no_title/total_results)*100
 
+# ## Testing Area
 
-# In[ ]:
+# Testing out getting intersection of properties across all documents
 
-source_no_title = search({'q': 'source:dataone', 'empty_field': 'title'})
+# In[155]:
 
-
-# In[ ]:
-
-source_no_title['total']
-
-
-# ### Filter Aggregation
-
-# Instead of adding filters to the queries, it looks like we can instead do some aggregations instead. 
-
-# In[ ]:
-
-agg_search = search({'q': '*', 'agg': True, 'empty_field': 'title', 'size':6000})
-
-
-# In[ ]:
-
-agg_search.keys()
-
-
-# In[ ]:
-
-agg_search['results']
+search('common_properties')
 
 
 # In[ ]:
