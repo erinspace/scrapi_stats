@@ -1,3 +1,4 @@
+from __future__ import division
 import json
 import requests
 
@@ -68,8 +69,10 @@ def top_fields():
   # },
 def fields_from_raw():
     fields = {}
+    fields['all_source_count_list'] = []
     for d in raw_data:
         if d.get('source'):
+            fields['all_source_count_list'].append(d['source'])
             for field in d.get('properties', {}).keys():
                 if fields.get(field):
                     fields[field]['count'] +=1
@@ -78,14 +81,30 @@ def fields_from_raw():
                 else:
                     fields[field] = {'count': 1, 'sources': set([d['source']]), 'all_sources': []}
 
+    fields['all_source_count'] = Counter(fields['all_source_count_list'])
+    del fields['all_source_count_list']
+
     for field, value in fields.iteritems():
-        value['sources_count'] = Counter(value['all_sources'])
-        value['sources'] = list(value['sources'])
-        del(value['sources'])
-        del(value['all_sources'])
+        if field != 'all_source_count':
+            value['sources_count'] = Counter(value['all_sources'])
+
+            # value['count'] -=1
+            del(value['sources'])
+            del(value['all_sources'])
+
+            value['source_percent'] = {}
+            value['percent_field_with_source'] = {}
+            for source, number in value['sources_count'].iteritems():
+                # value['source_percent'][source] = (number/value['count'])*100
+                value['source_percent'][source] = '{}/{}'.format(number, value['count'])
+                # value['percent_field_with_source'][source] = round((number/fields['all_source_count'][source])*100)
+                value['percent_field_with_source'][source] = '{}/{}'.format(number, fields['all_source_count'][source])
+
+
 
     print(json.dumps(fields, indent=4))
 
+    import pdb; pdb.set_trace()
 
 
 fields_from_raw()
