@@ -33,8 +33,6 @@ def large_dot_plot():
     plt.show()
 
 
-# large_dot_plot()
-
 def top_fields():
     fields = [] 
     num_sources = []
@@ -61,12 +59,6 @@ def top_fields():
         print('The field {} is in {} different providers').format(item['term'], item['num_sources'])
 
 
-  # "issued": {
-  #   "count": 15243,
-  #   "sources": [
-  #     "crossref"
-  #   ]
-  # },
 def fields_from_raw():
     fields = {}
     fields['all_source_count_list'] = []
@@ -89,44 +81,26 @@ def fields_from_raw():
             value['sources_count'] = Counter(value['all_sources'])
 
             # value['count'] -=1
-            del(value['sources'])
+            # del(value['sources'])
             del(value['all_sources'])
 
             value['source_percent'] = {}
             value['percent_field_with_source'] = {}
             for source, number in value['sources_count'].iteritems():
-                # value['source_percent'][source] = (number/value['count'])*100
-                value['source_percent'][source] = '{}/{}'.format(number, value['count'])
-                # value['percent_field_with_source'][source] = round((number/fields['all_source_count'][source])*100)
-                value['percent_field_with_source'][source] = '{}/{}'.format(number, fields['all_source_count'][source])
+                value['source_percent'][source] = round((number/value['count'])*100)
+                # value['source_percent'][source] = '{}/{}'.format(number, value['count'])
+                value['percent_field_with_source'][source] = round((number/fields['all_source_count'][source])*100)
+                # value['percent_field_with_source'][source] = '{}/{}'.format(number, fields['all_source_count'][source])
 
-
-
-    print(json.dumps(fields, indent=4))
-
-    import pdb; pdb.set_trace()
+    for field, value in fields.iteritems():
+        for key, item in value.iteritems():
+            if key == 'percent_field_with_source':
+                print(json.dumps(item, indent=4))
 
 
 fields_from_raw()
  
 top_fields()
 
-
-# total_docs = 90729
-
-
-### To Get fields!!! ##
-## Do this on the osf!!
-## use the shell! 
-def get_fields_from_metadata():
-    fields = {}
-    for d in Metadata.find():
-        if d.get('isResource'):
-            for field in d.get('properties', {}).keys():
-                if fields.get(field):
-                    fields[field]['count'] +=1
-                    fields[field]['sources'].add(d['source'])
-                else:
-                    fields[field] = {'count': 1, 'sources': set([d['source']])}
-
+large_dot_plot()
 
