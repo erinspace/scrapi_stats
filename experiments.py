@@ -92,15 +92,25 @@ def fields_from_raw():
                 value['percent_field_with_source'][source] = round((number/fields['all_source_count'][source])*100)
                 # value['percent_field_with_source'][source] = '{}/{}'.format(number, fields['all_source_count'][source])
 
+    field_source_percents = {}
     for field, value in fields.iteritems():
         for key, item in value.iteritems():
             if key == 'percent_field_with_source':
-                print(json.dumps(item, indent=4))
+                # print(json.dumps(item, indent=4))
+                field_source_percents[field] = item
 
+    return field_source_percents
 
-fields_from_raw()
+def fields_bar_chart():
+    source_percents = fields_from_raw()
+
+    print(json.dumps(source_percents, indent=4))
+
+fields_bar_chart()
+
+# fields_from_raw()
  
-top_fields()
+# top_fields()
 
-large_dot_plot()
+# large_dot_plot()
 
