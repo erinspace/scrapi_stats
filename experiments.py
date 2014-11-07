@@ -1,10 +1,10 @@
 from __future__ import division
-import json
-import requests
 
+import json
 import operator
-from collections import Counter
+import requests
 import numpy as np 
+from collections import Counter
 import matplotlib.pyplot as plt
 
 
