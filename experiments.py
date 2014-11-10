@@ -59,7 +59,7 @@ def top_fields():
         print('The field {} is in {} different providers').format(item['term'], item['num_sources'])
 
 
-def fields_from_raw():
+def fields_from_raw(percents=True):
     fields = {}
     fields['all_source_count_list'] = []
     for d in raw_data:
@@ -87,10 +87,12 @@ def fields_from_raw():
             value['source_percent'] = {}
             value['percent_field_with_source'] = {}
             for source, number in value['sources_count'].iteritems():
-                value['source_percent'][source] = round((number/value['count'])*100)
-                # value['source_percent'][source] = '{}/{}'.format(number, value['count'])
-                value['percent_field_with_source'][source] = round((number/fields['all_source_count'][source])*100)
-                # value['percent_field_with_source'][source] = '{}/{}'.format(number, fields['all_source_count'][source])
+                if percents:
+                    value['source_percent'][source] = round((number/value['count'])*100)
+                    value['percent_field_with_source'][source] = round((number/fields['all_source_count'][source])*100)
+                else: 
+                    value['source_percent'][source] = '{}/{}'.format(number, value['count'])
+                    value['percent_field_with_source'][source] = '{}/{}'.format(number, fields['all_source_count'][source])
 
     field_source_percents = {}
     for field, value in fields.iteritems():
