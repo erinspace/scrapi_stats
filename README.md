@@ -151,6 +151,379 @@ crossref: 0.646469073577
 uceschol: 0.121359223301
 spdataverse: 27.27
 
+## Properties Fields
+
+The top 10 fields are...
+permissions is in 3 different providers
+coverage is in 3 different providers
+identifiers is in 4 different providers
+relation is in 5 different providers
+publisher is in 5 different providers
+language is in 7 different providers
+source is in 8 different providers
+publisherInfo is in 8 different providers
+format is in 10 different providers
+type is in 13 different providers
+
+
+## All Properties Fields and their Sources
+
+Properties by Field, provider, and Numbers of Entries Per Provider as a percent
+
+{
+    "preferredReplicationMN": {
+        "dataone": 100.0
+    },
+    "issued": {
+        "crossref": 100.0
+    },
+    "set_spec": {
+        "arxiv_oai": 100.0,
+        "opensiuc": 100.0
+    },
+    "datePublished": {
+        "dataone": 100.0
+    },
+    "relation": {
+        "uceschol": 100.0,
+        "doepages": 100.0,
+        "vtechworks": 100.0,
+        "scitech": 100.0,
+        "mit": 100.0
+    },
+    "sku": {
+        "dataone": 100.0
+    },
+    "member": {
+        "crossref": 100.0
+    },
+    "pubDate": {
+        "dataone": 100.0
+    },
+    "source": {
+        "upenn": 100.0,
+        "clinicaltrials": 100.0,
+        "utaustin": 100.0,
+        "wayne": 99.0,
+        "calpoly": 100.0,
+        "cmu": 100.0,
+        "opensiuc": 100.0,
+        "mit": 66.0
+    },
+    "formatId": {
+        "dataone": 100.0
+    },
+    "secondary_outcomes": {
+        "clinicaltrials": 100.0
+    },
+    "articleType": {
+        "scitech": 100.0,
+        "plos": 100.0
+    },
+    "pdf_download": {
+        "opensiuc": 99.0
+    },
+    "format": {
+        "uceschol": 100.0,
+        "doepages": 100.0,
+        "upenn": 100.0,
+        "utaustin": 100.0,
+        "wayne": 99.0,
+        "calpoly": 100.0,
+        "scitech": 100.0,
+        "opensiuc": 100.0,
+        "mit": 100.0,
+        "arxiv_oai": 100.0
+    },
+    "sponsors": {
+        "clinicaltrials": 100.0
+    },
+    "authorSurName": {
+        "dataone": 100.0
+    },
+    "isFDARegulated": {
+        "clinicaltrials": 100.0
+    },
+    "replicaMN": {
+        "dataone": 100.0
+    },
+    "eissn": {
+        "plos": 100.0
+    },
+    "condition": {
+        "clinicaltrials": 100.0
+    },
+    "permissions": {
+        "uceschol": 100.0,
+        "vtechworks": 100.0,
+        "mit": 100.0
+    },
+    "researchCountry": {
+        "scitech": 100.0
+    },
+    "numberReplicas": {
+        "dataone": 0.0
+    },
+    "investigator": {
+        "dataone": 100.0
+    },
+    "armGroup": {
+        "clinicaltrials": 100.0
+    },
+    "scientificName": {
+        "dataone": 100.0
+    },
+    "isDocumentedBy": {
+        "dataone": 100.0
+    },
+    "identifier": {
+        "dataone": 100.0,
+        "doepages": 96.0
+    },
+    "page": {
+        "crossref": 100.0
+    },
+    "fileID": {
+        "dataone": 100.0
+    },
+    "primaryOutcome": {
+        "clinicaltrials": 100.0
+    },
+    "isSection801": {
+        "clinicaltrials": 100.0
+    },
+    "responsible_party": {
+        "clinicaltrials": 100.0
+    },
+    "referenceCount": {
+        "crossref": 100.0
+    },
+    "researchSponsor": {
+        "scitech": 100.0
+    },
+    "numberOfArms": {
+        "clinicaltrials": 100.0
+    },
+    "score": {
+        "plos": 100.0,
+        "crossref": 100.0
+    },
+    "verificationDate": {
+        "clinicaltrials": 100.0
+    },
+    "replicationAllowed": {
+        "dataone": 100.0
+    },
+    "identifier-purl": {
+        "doepages": 96.0
+    },
+    "intervention": {
+        "clinicaltrials": 100.0
+    },
+    "issue": {
+        "crossref": 100.0
+    },
+    "eligibility": {
+        "clinicaltrials": 100.0
+    },
+    "journal": {
+        "plos": 100.0
+    },
+    "checksumAlgorithm": {
+        "dataone": 100.0
+    },
+    "dateEntered": {
+        "scitech": 100.0
+    },
+    "publisher": {
+        "calpoly": 100.0,
+        "opensiuc": 100.0,
+        "utaustin": 100.0,
+        "columbia": 100.0,
+        "crossref": 100.0
+    },
+    "authorGivenName": {
+        "dataone": 4.0
+    },
+    "language": {
+        "columbia": 100.0,
+        "utaustin": 100.0,
+        "uwdspace": 100.0,
+        "doepages": 96.0,
+        "vtechworks": 100.0,
+        "scitech": 100.0,
+        "mit": 100.0
+    },
+    "lastChanged": {
+        "clinicaltrials": 100.0
+    },
+    "dateUploaded": {
+        "dataone": 100.0
+    },
+    "checksum": {
+        "dataone": 100.0
+    },
+    "hasExpandedAccess": {
+        "clinicaltrials": 100.0
+    },
+    "datasource": {
+        "dataone": 100.0
+    },
+    "studyDesign": {
+        "clinicaltrials": 100.0
+    },
+    "resource_type": {
+        "columbia": 99.0
+    },
+    "identifierReport": {
+        "doepages": 96.0
+    },
+    "origin": {
+        "dataone": 100.0
+    },
+    "locationCountries": {
+        "clinicaltrials": 100.0
+    },
+    "oversightAuthority": {
+        "clinicaltrials": 100.0
+    },
+    "typeQualifier": {
+        "doepages": 96.0
+    },
+    "size": {
+        "dataone": 100.0
+    },
+    "replicaVerifiedDate": {
+        "dataone": 100.0
+    },
+    "identifierInfo": {
+        "scitech": 100.0
+    },
+    "deposited": {
+        "crossref": 100.0
+    },
+    "researchOrg": {
+        "scitech": 100.0
+    },
+    "type": {
+        "uceschol": 100.0,
+        "doepages": 100.0,
+        "upenn": 100.0,
+        "utaustin": 100.0,
+        "mit": 100.0,
+        "wayne": 99.0,
+        "uwdspace": 100.0,
+        "calpoly": 100.0,
+        "cmu": 100.0,
+        "opensiuc": 100.0,
+        "vtechworks": 100.0,
+        "arxiv_oai": 100.0,
+        "crossref": 100.0
+    },
+    "citation": {
+        "uceschol": 100.0
+    },
+    "dataUrl": {
+        "dataone": 100.0
+    },
+    "volume": {
+        "crossref": 100.0
+    },
+    "link": {
+        "clinicaltrials": 100.0
+    },
+    "resourceMap": {
+        "dataone": 100.0
+    },
+    "depositedTimestamp": {
+        "crossref": 100.0
+    },
+    "published-in": {
+        "crossref": 100.0
+    },
+    "rights": {
+        "doepages": 96.0,
+        "utaustin": 100.0
+    },
+    "enrollment": {
+        "clinicaltrials": 100.0
+    },
+    "authoritativeMN": {
+        "dataone": 100.0
+    },
+    "updateDate": {
+        "dataone": 100.0
+    },
+    "ISBN": {
+        "crossref": 100.0
+    },
+    "identifierOther": {
+        "doepages": 96.0
+    },
+    "rightsHolder": {
+        "dataone": 100.0
+    },
+    "site": {
+        "dataone": 100.0
+    },
+    "formatType": {
+        "dataone": 100.0
+    },
+    "author": {
+        "dataone": 100.0
+    },
+    "ISSN": {
+        "crossref": 100.0
+    },
+    "identifierDOEcontract": {
+        "doepages": 96.0
+    },
+    "updatePolicy": {
+        "crossref": 100.0
+    },
+    "indexed": {
+        "crossref": 100.0
+    },
+    "dateModified": {
+        "dataone": 100.0
+    },
+    "status": {
+        "clinicaltrials": 100.0
+    },
+    "isPublic": {
+        "dataone": 100.0
+    },
+    "publisherInfo": {
+        "uceschol": 100.0,
+        "doepages": 100.0,
+        "upenn": 100.0,
+        "mit": 100.0,
+        "wayne": 99.0,
+        "uwdspace": 100.0,
+        "cmu": 100.0,
+        "vtechworks": 100.0
+    },
+    "documents": {
+        "dataone": 12.0
+    },
+    "coverage": {
+        "uceschol": 100.0,
+        "doepages": 100.0,
+        "scitech": 100.0
+    },
+    "date": {
+        "opensiuc": 99.0
+    },
+    "readPermission": {
+        "dataone": 100.0
+    },
+    "identifiers": {
+        "opensiuc": 100.0,
+        "mit": 100.0,
+        "uwdspace": 100.0,
+        "utaustin": 100.0
+    }
+}
 
 
 
