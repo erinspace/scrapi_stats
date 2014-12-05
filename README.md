@@ -97,79 +97,80 @@ Current Stats for scrAPI projects - As of December 4, 2014
 
 ## Document Counts
 
-total - 241720
+### total - 241720
 
-arxiv_oai, 48987
-crossref, 36506
-scitech, 18155
-dataone, 16963
-clinicaltrials, 8341
-plos, 6215
-figshare, 3581
-uwdspace, 3016
-mit, 1961
-upenn, 1451
-uceschol, 824
-vtechworks, 633
-opensiuc, 358
-columbia, 338
-calpoly, 283
-cmu, 278
-wayne, 272
-doepages, 66
-trinity, 22
-spdataverse, 11
-utaustin, 9
-pushtest, 2
-stcloud, 2
+    arxiv_oai, 48987
+    crossref, 36506
+    scitech, 18155
+    dataone, 16963
+    clinicaltrials, 8341
+    plos, 6215
+    figshare, 3581
+    uwdspace, 3016
+    mit, 1961
+    upenn, 1451
+    uceschol, 824
+    vtechworks, 633
+    opensiuc, 358
+    columbia, 338
+    calpoly, 283
+    cmu, 278
+    wayne, 272
+    doepages, 66
+    trinity, 22
+    spdataverse, 11
+    utaustin, 9
+    pushtest, 2
+    stcloud, 2
 
 ## Missing Fields
 
 Percents missing a DOI
 
-uwdspace: 100.0
-vtechworks: 99.3680884676
-utaustin: 100.0
-wayne: 100.0
-scitech: 18.4467088956
-mit: 48.4446710862
-trinity: 100.0
-stcloud: 100.0
-arxiv_oai: 59.917937412
-uceschol: 94.0533980583
-upenn: 100.0
-clinicaltrials: 100.0
-dataone: 86.918587514
-calpoly: 100.0
-cmu: 64.7482014388
-spdataverse: 100.0
+    uwdspace: 100.0
+    vtechworks: 99.3680884676
+    utaustin: 100.0
+    wayne: 100.0
+    scitech: 18.4467088956
+    mit: 48.4446710862
+    trinity: 100.0
+    stcloud: 100.0
+    arxiv_oai: 59.917937412
+    uceschol: 94.0533980583
+    upenn: 100.0
+    clinicaltrials: 100.0
+    dataone: 86.918587514
+    calpoly: 100.0
+    cmu: 64.7482014388
+    spdataverse: 100.0
 
 
 Percents Missing a Title
 
-crossref: 0.646469073577
-uceschol: 0.121359223301
-spdataverse: 27.27
+    crossref: 0.646469073577
+    uceschol: 0.121359223301
+    spdataverse: 27.27
 
 ## Properties Fields
 
 The top 10 fields are...
-permissions is in 3 different providers
-coverage is in 3 different providers
-identifiers is in 4 different providers
-relation is in 5 different providers
-publisher is in 5 different providers
-language is in 7 different providers
-source is in 8 different providers
-publisherInfo is in 8 different providers
-format is in 10 different providers
-type is in 13 different providers
+- permissions is in 3 different providers
+- coverage is in 3 different providers
+- identifiers is in 4 different providers
+- relation is in 5 different providers
+- publisher is in 5 different providers
+- language is in 7 different providers
+- source is in 8 different providers
+- publisherInfo is in 8 different providers
+- format is in 10 different providers
+- type is in 13 different providers
 
 
 ## All Properties Fields and their Sources
 
 Properties by Field, provider, and Numbers of Entries Per Provider as a percent
 
+```
 {
     "preferredReplicationMN": {
         "dataone": 100.0
@@ -524,7 +525,7 @@ Properties by Field, provider, and Numbers of Entries Per Provider as a percent
         "utaustin": 100.0
     }
 }
-
+```
 
 
 
