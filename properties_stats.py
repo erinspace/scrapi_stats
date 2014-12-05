@@ -104,11 +104,11 @@ def fields_from_raw(percents=True):
     return field_source_percents
 
 def fields_bar_chart():
-    source_percents = fields_from_raw()
+    source_percents = fields_from_raw(percents=False)
 
     print(json.dumps(source_percents, indent=4))
 
-# fields_bar_chart()
+fields_bar_chart()
 
 # fields_from_raw()
  
