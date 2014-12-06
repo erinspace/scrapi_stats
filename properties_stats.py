@@ -60,36 +60,51 @@ def top_fields():
 
 
 def fields_from_raw(percents=True):
+    ''' percents is used later on to determine the output of the  function. 
+    If True, it returns a percentage from that source that have each field. 
+    If False, it returns the raw numbers 
+    '''
+
     fields = {}
     fields['all_source_count_list'] = []
     for d in raw_data:
+        # This ensures it's a report and not a resource
         if d.get('source'):
             fields['all_source_count_list'].append(d['source'])
             for field in d.get('properties', {}).keys():
-                if fields.get(field):
-                    fields[field]['count'] +=1
+                if fields.get(field) and fields.get(field) != '':
+                    fields[field]['count'] += 1
                     fields[field]['sources'].add(d['source'])
                     fields[field]['all_sources'].append(d['source'])
                 else:
                     fields[field] = {'count': 1, 'sources': set([d['source']]), 'all_sources': []}
 
+    '''
+    fields is a dict with keys that are each of the field names found in properties
+    fields has one key that is special - all_sources_count, that is a record
+    of every time the field ever appears
+    Each field value is a dict, with the keys count, sources, and all_sources.
+    - count is an int, and is the number of times that field appears
+    - sources is a set, and is just the sources that have that field
+    - all_sources is a cumultive list of every time that field appeared
+    '''
+
     fields['all_source_count'] = Counter(fields['all_source_count_list'])
+    import pdb; pdb.set_trace()
     del fields['all_source_count_list']
 
     for field, value in fields.iteritems():
         if field != 'all_source_count':
             value['sources_count'] = Counter(value['all_sources'])
 
-            # value['count'] -=1
-            # del(value['sources'])
             del(value['all_sources'])
 
             value['source_percent'] = {}
             value['percent_field_with_source'] = {}
             for source, number in value['sources_count'].iteritems():
                 if percents:
-                    value['source_percent'][source] = round((number/value['count'])*100)
-                    value['percent_field_with_source'][source] = round((number/fields['all_source_count'][source])*100)
+                    value['source_percent'][source] = round((number/value['count'], 2)*100)
+                    value['percent_field_with_source'][source] = round((number/fields['all_source_count'][source], 2)*100)
                 else: 
                     value['source_percent'][source] = '{}/{}'.format(number, value['count'])
                     value['percent_field_with_source'][source] = '{}/{}'.format(number, fields['all_source_count'][source])
@@ -103,12 +118,12 @@ def fields_from_raw(percents=True):
 
     return field_source_percents
 
-def fields_bar_chart():
+def fields_data():
     source_percents = fields_from_raw(percents=False)
 
     print(json.dumps(source_percents, indent=4))
 
-fields_bar_chart()
+fields_data()
 
 # fields_from_raw()
  
