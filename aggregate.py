@@ -40,8 +40,11 @@ def query_osf(query):
     return response.json()
 
 
-def search(missing_terms):
-    query = nested_agg_query(missing_terms)
+def search(aggs):
+    query = {
+        'size': 0,
+        'aggs': aggs
+    }
     osf_query = query_osf(query)
     return osf_query
 
@@ -57,42 +60,39 @@ def simple_agg_query():
     }
 
 
-def nested_agg_query(terms):
+def missing_agg_query(terms):
     return {
-        "size": 0,
-        "aggs": {
-            term + "Aggregation": {
-                "filter": {
-                    "missing": {"field": term}
-                },
+        "missing{}Aggregation".format(term): {
+            "filter": {
+                "missing": {"field": term}
+            },
 
-                "aggs": {
-                    "sources": {
-                        "terms": {"field": "source"}
-                    }
+            "aggs": {
+                "sources": {
+                    "terms": {"field": "source"}
                 }
-            } for term in terms
-
-        }
+            }
+        } for term in terms
     }
-
-
-def usage():
-    print('Usage:')
-    print('-t or --terms: enter terms you would like to see are missing from each source')
 
 
 def parse_args():
     parser = argparse.ArgumentParser(description="A command line interface for getting numbers of SHARE sources missing given terms")
 
-    parser.add_argument('terms', type=str, help='The terms to search for', nargs='+')
+    parser.add_argument('-m', '--missing', dest='missing', type=str, help='The terms to aggregate with.', nargs='+')
+
     return parser.parse_args()
 
 
 def main():
     args = parse_args()
+    aggs = {}
+    if args.missing:
+        aggs.update(missing_agg_query(args.missing))
+    # if args.whatever:
+    #     aggs.update(other_function(args.whatever))
 
-    search_osf = search(args.terms)
+    search_osf = search(aggs)
 
     print(json.dumps(search_osf, indent=4))
 
