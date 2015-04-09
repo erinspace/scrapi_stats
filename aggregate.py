@@ -4,6 +4,9 @@ import json
 import argparse
 import requests
 
+import numpy as np
+import matplotlib.pyplot as plt
+
 # Local settings
 OSF_APP_URL = 'http://localhost:5000/api/v1/share/search/?raw=True'
 
@@ -71,6 +74,53 @@ def terms_agg_query(terms, size):
     }
 
 
+def extract_values_and_labels(elastic_results):
+    ''' Takes a list of dictionaries of the results of
+    an elasticsearch aggregation, and converts them into
+    two lists - of values, and labels - to be used in
+    plotting later.
+
+    Returns a dictionary with the lists of values and labels
+    '''
+    labels = []
+    values = []
+    for item in elastic_results:
+        labels.append(item['key'])
+        values.append(item['doc_count'])
+
+    return values, labels
+
+
+def create_pie_chart(elastic_results, title, field_for_title=''):
+    ''' takes a list of elastic results, and
+    returns a bar graph of the doc counts.
+    Looks very messy at the moment - need to fix labels'''
+
+    values, labels = extract_values_and_labels(elastic_results)
+
+    plt.pie(values, labels=labels)
+    plt.title(title + field_for_title)
+    plt.show()
+
+
+def create_bar_graph(elastic_results,  x_label, title, field_for_title=''):
+    ''' takes a list of elastic results, and
+    returns a bar graph of the doc counts'''
+
+    values, labels = extract_values_and_labels(elastic_results)
+
+    index = np.arange(len(values))
+    width = 0.35
+
+    plt.bar(index, values)
+
+    plt.xticks(index + width / 2, labels, rotation='vertical')
+    plt.xlabel(x_label)
+    plt.ylabel('Document Count')
+    plt.title(title + field_for_title)
+    plt.show()
+
+
 def parse_args():
     parser = argparse.ArgumentParser(description="A command line interface for getting numbers of SHARE sources missing given terms")
 
@@ -78,6 +128,8 @@ def parse_args():
     parser.add_argument('-t', '--terms', dest='terms', type=str, help='The top unique entries with given terms. Use with size to control number of results shown.', nargs='+')
     parser.add_argument('-s', '--size', dest='size', type=int, help='The number of results to return per aggretation', default=0)
     parser.add_argument('-i', '--includes', dest='includes', type=str, help='The terms to aggregate with, to find sources with terms included', nargs='+')
+    parser.add_argument('-b', '--bargraph', dest='bargraph', help='A flag to signal to draw a bar graph', action='store_true')
+    parser.add_argument('-p', '--piegraph', dest='piegraph', help='A flag to signal to draw a pie graph', action='store_true')
 
     return parser.parse_args()
 
@@ -92,9 +144,14 @@ def main():
     if args.includes:
         aggs.update(includes_agg_query(args.includes))
 
-    search_osf = search(aggs)
+    results = search(aggs)
 
-    print(json.dumps(search_osf, indent=4))
+    if args.bargraph:
+        create_bar_graph(results, 'terms', 'SHARE Results')
+    if args.piegraph:
+        create_pie_chart(results, 'SHARE Results')
+    else:
+        print(json.dumps(results, indent=4))
 
 
 if __name__ == '__main__':
