@@ -1,7 +1,33 @@
-scrapi_stats
+# SHARE Stats
 
-Github Repo: https://github.com/erinspace/scrapi_stats
+usage: aggregate.py [-h] [-m MISSING [MISSING ...]] [-t TERMS [TERMS ...]]
+                    [-s SIZE] [-i INCLUDES [INCLUDES ...]] [-b] [-p]
 
+examples: 
+- python aggregate.py -i description (will generate counts for all sources with descriptions)
+- python aggregate.py -m sponsor (will generate counts for all sources without sponsors)
+- python aggregate.py -t tags (will generate top list for elements with that name)
+
+```
+A command line interface for getting numbers of SHARE sources missing given
+terms
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -m MISSING [MISSING ...], --missing MISSING [MISSING ...]
+                        The terms to aggregate with, to find sources with
+                        terms missing
+  -t TERMS [TERMS ...], --terms TERMS [TERMS ...]
+                        The top unique entries with given terms. Use with size
+                        to control number of results shown.
+  -s SIZE, --size SIZE  The number of results to return per aggretation
+  -i INCLUDES [INCLUDES ...], --includes INCLUDES [INCLUDES ...]
+                        The terms to aggregate with, to find sources with
+                        terms included
+  -b, --bargraph        A flag to signal to draw a bar graph
+  -p, --piegraph        A flag to signal to draw a pie graph
+  
+```
 Current Stats for scrAPI projects - As of December 4, 2014
 
 ## Harvester Names - for Reference
