@@ -74,6 +74,16 @@ def terms_agg_query(terms, size):
     }
 
 
+def full_results_to_list(full_elastic_results):
+    ''' takes the raw elastic search results, and
+    returns a simplified version with just a list of
+    all the doc counts and their values '''
+    try:
+        return full_elastic_results['aggregations']['sources']['buckets']
+    except KeyError:
+        return full_elastic_results['aggregations']['sourceAggregation']['sources']['buckets']
+
+
 def extract_values_and_labels(elastic_results):
     ''' Takes a list of dictionaries of the results of
     an elasticsearch aggregation, and converts them into
@@ -96,7 +106,8 @@ def create_pie_chart(elastic_results, title, field_for_title=''):
     returns a bar graph of the doc counts.
     Looks very messy at the moment - need to fix labels'''
 
-    values, labels = extract_values_and_labels(elastic_results)
+    simplified_elastic_results = full_results_to_list(elastic_results)
+    values, labels = extract_values_and_labels(simplified_elastic_results)
 
     plt.pie(values, labels=labels)
     plt.title(title + field_for_title)
@@ -106,8 +117,8 @@ def create_pie_chart(elastic_results, title, field_for_title=''):
 def create_bar_graph(elastic_results,  x_label, title, field_for_title=''):
     ''' takes a list of elastic results, and
     returns a bar graph of the doc counts'''
-
-    values, labels = extract_values_and_labels(elastic_results)
+    simplified_elastic_results = full_results_to_list(elastic_results)
+    values, labels = extract_values_and_labels(simplified_elastic_results)
 
     index = np.arange(len(values))
     width = 0.35
