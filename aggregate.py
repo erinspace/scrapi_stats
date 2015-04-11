@@ -91,7 +91,7 @@ def extract_values_and_labels(elastic_results):
     two lists - of values, and labels - to be used in
     plotting later.
 
-    Returns a dictionary with the lists of values and labels
+    Returns a tuple with the lists of values and labels
     '''
     labels = []
     values = []
@@ -102,20 +102,20 @@ def extract_values_and_labels(elastic_results):
     return values, labels
 
 
-def create_pie_chart(elastic_results, terms, title, field_for_title=''):
+def create_pie_chart(elastic_results, terms, agg_type, title):
     ''' takes a list of elastic results, and
     returns a bar graph of the doc counts.
     Looks very messy at the moment - need to fix labels'''
 
-    simplified_elastic_results = full_results_to_list(elastic_results, terms)
+    simplified_elastic_results = full_results_to_list(elastic_results, terms, agg_type)
     values, labels = extract_values_and_labels(simplified_elastic_results)
 
     plt.pie(values, labels=labels)
-    plt.title(title + field_for_title)
+    plt.title('{} {} {}'.format(title, agg_type, terms[0]))
     plt.show()
 
 
-def create_bar_graph(elastic_results, terms, agg_type, x_label, title, field_for_title=''):
+def create_bar_graph(elastic_results, terms, agg_type, x_label, title):
     ''' takes a list of elastic results, and
     returns a bar graph of the doc counts'''
     simplified_elastic_results = full_results_to_list(elastic_results, terms, agg_type)
@@ -129,7 +129,7 @@ def create_bar_graph(elastic_results, terms, agg_type, x_label, title, field_for
     plt.xticks(index + width / 2, labels, rotation='vertical')
     plt.xlabel(x_label)
     plt.ylabel('Document Count')
-    plt.title(title + field_for_title)
+    plt.title('{} {} {}'.format(title, agg_type, terms[0]))
     plt.show()
 
 
@@ -160,14 +160,14 @@ def main():
 
     results = search(aggs)
 
+    print(json.dumps(results, indent=4))
+
     graph_variable = args.missing or args.includes
 
     if args.bargraph:
         create_bar_graph(elastic_results=results, terms=graph_variable, agg_type=agg_type, x_label='terms', title='SHARE Results')
     if args.piegraph:
-        create_pie_chart(results, terms=args.terms, title='SHARE Results')
-    else:
-        print(json.dumps(results, indent=4))
+        create_pie_chart(results, terms=graph_variable, agg_type=agg_type, title='SHARE Results')
 
 
 if __name__ == '__main__':
