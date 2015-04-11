@@ -74,14 +74,15 @@ def terms_agg_query(terms, size):
     }
 
 
-def full_results_to_list(full_elastic_results):
+def full_results_to_list(full_elastic_results, terms, agg_type):
     ''' takes the raw elastic search results, and
     returns a simplified version with just a list of
     all the doc counts and their values '''
+    term = terms[0]
     try:
         return full_elastic_results['aggregations']['sources']['buckets']
     except KeyError:
-        return full_elastic_results['aggregations']['sourceAggregation']['sources']['buckets']
+        return full_elastic_results['aggregations']['{}{}Aggregation'.format(term, agg_type)]['sources']['buckets']
 
 
 def extract_values_and_labels(elastic_results):
@@ -101,12 +102,12 @@ def extract_values_and_labels(elastic_results):
     return values, labels
 
 
-def create_pie_chart(elastic_results, title, field_for_title=''):
+def create_pie_chart(elastic_results, terms, title, field_for_title=''):
     ''' takes a list of elastic results, and
     returns a bar graph of the doc counts.
     Looks very messy at the moment - need to fix labels'''
 
-    simplified_elastic_results = full_results_to_list(elastic_results)
+    simplified_elastic_results = full_results_to_list(elastic_results, terms)
     values, labels = extract_values_and_labels(simplified_elastic_results)
 
     plt.pie(values, labels=labels)
@@ -114,10 +115,10 @@ def create_pie_chart(elastic_results, title, field_for_title=''):
     plt.show()
 
 
-def create_bar_graph(elastic_results,  x_label, title, field_for_title=''):
+def create_bar_graph(elastic_results, terms, agg_type, x_label, title, field_for_title=''):
     ''' takes a list of elastic results, and
     returns a bar graph of the doc counts'''
-    simplified_elastic_results = full_results_to_list(elastic_results)
+    simplified_elastic_results = full_results_to_list(elastic_results, terms, agg_type)
     values, labels = extract_values_and_labels(simplified_elastic_results)
 
     index = np.arange(len(values))
@@ -149,18 +150,22 @@ def main():
     args = parse_args()
     aggs = {}
     if args.missing:
+        agg_type = 'Missing'
         aggs.update(missing_agg_query(args.missing))
     if args.terms:
         aggs.update(terms_agg_query(args.terms, args.size))
     if args.includes:
+        agg_type = 'NotMissing'
         aggs.update(includes_agg_query(args.includes))
 
     results = search(aggs)
 
+    graph_variable = args.missing or args.includes
+
     if args.bargraph:
-        create_bar_graph(results, 'terms', 'SHARE Results')
+        create_bar_graph(elastic_results=results, terms=graph_variable, agg_type=agg_type, x_label='terms', title='SHARE Results')
     if args.piegraph:
-        create_pie_chart(results, 'SHARE Results')
+        create_pie_chart(results, terms=args.terms, title='SHARE Results')
     else:
         print(json.dumps(results, indent=4))
 
