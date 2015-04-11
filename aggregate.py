@@ -8,10 +8,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Local settings
-OSF_APP_URL = 'http://localhost:5000/api/v1/share/search/?raw=True'
+# OSF_APP_URL = 'http://localhost:5000/api/v1/share/search/?raw=True'
 
-# share-dev settings
-# OSF_APP_URL = 'https://osf.io/api/v1/share/search/?raw=True'
+# production SHARE settings
+OSF_APP_URL = 'https://osf.io/api/v1/share/search/?raw=True'
 
 
 def query_osf(query):
@@ -123,6 +123,9 @@ def create_bar_graph(elastic_results, terms, agg_type, x_label, title):
 
     index = np.arange(len(values))
     width = 0.35
+
+    if agg_type == 'NotMissing':
+        agg_type = 'Including'
 
     plt.bar(index, values)
 
