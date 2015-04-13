@@ -186,6 +186,7 @@ def create_bar_graph(elastic_results, terms, agg_type, x_label, title):
     # plt.show(title + 'BarGraph', )
     plt.savefig('figures/' + title.replace('SHARE Results ', '').replace(' ', '') + 'BarGraph')
 
+
 def create_bubble(results):
     tags = results['aggregations']['tagsTermFilter']['buckets']
     x = list(range(len(tags)))
