@@ -11,21 +11,21 @@ import matplotlib.pyplot as plt
 # OSF_APP_URL = 'http://localhost:5000/api/v1/share/search/?raw=True'
 
 # production SHARE settings
-OSF_APP_URL = 'https://osf.io/api/v1/share/search/?raw=True&v=1'
+OSF_APP_URL = 'https://osf.io/api/v1/share/search/?raw=True&v={}'
 
 
-def query_osf(query):
-    response = requests.post(OSF_APP_URL, json=query, verify=False)
+def query_osf(url, query):
+    response = requests.post(url, json=query, verify=False)
     return response.json()
 
 
-def search(aggs):
+def search(url, aggs):
     query = {
         'size': 0,
         'aggs': aggs
     }
 
-    osf_query = query_osf(query)
+    osf_query = query_osf(url, query)
     return osf_query
 
 
@@ -194,6 +194,7 @@ def parse_args():
     parser.add_argument('-m', '--missing', dest='missing', type=str, help='The terms to aggregate with, to find sources with terms missing', nargs='+')
     parser.add_argument('-t', '--terms', dest='terms', type=str, help='The top unique entries with given terms. Use with size to control number of results shown.', nargs='+')
     parser.add_argument('-s', '--size', dest='size', type=int, help='The number of results to return per aggretation', default=0)
+    parser.add_argument('-v', '--version', dest='v', type=int, help='The version of the OSF SHARE API to hit', default=2)
     parser.add_argument('-i', '--includes', dest='includes', type=str, help='The terms to aggregate with, to find sources with terms included', nargs='+')
     parser.add_argument('-b', '--bargraph', dest='bargraph', help='A flag to signal to draw a bar graph', action='store_true')
     parser.add_argument('-p', '--piegraph', dest='piegraph', help='A flag to signal to draw a pie graph', action='store_true')
@@ -214,7 +215,9 @@ def main():
         agg_type = 'NotMissing'
         aggs.update(includes_agg_query(args.includes))
 
-    results = search(aggs)
+    url = OSF_APP_URL.format(args.v)
+
+    results = search(url, aggs)
 
     print(json.dumps(results, indent=4))
 
