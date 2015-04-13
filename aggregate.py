@@ -105,17 +105,24 @@ def full_results_to_list(full_elastic_results, terms, agg_type):
     all the doc counts and their values '''
     term = terms[0]
 
-    agg_results = full_elastic_results['aggregations']['{}{}Aggregation'.format(term, agg_type)]['sources']['buckets']
-
     source_counts = {
         result['key']: result['doc_count']
         for result in full_elastic_results['aggregations']['allSourceAgg']['buckets']
     }
 
-    return [{
-        'key': result['key'],
-        'percent': float(result['doc_count']) / source_counts[result['key']] * 100
-    } for result in agg_results]
+    if agg_type == 'Term':
+        agg_results = full_elastic_results['aggregations']['{}{}Filter'.format(term, agg_type)]['buckets']
+        return [{
+            'key': result['key'],
+            'value': float(result['doc_count'])
+        } for result in agg_results]
+
+    else:
+        agg_results = full_elastic_results['aggregations']['{}{}Aggregation'.format(term, agg_type)]['sources']['buckets']
+        return [{
+            'key': result['key'],
+            'value': float(result['doc_count']) / source_counts[result['key']] * 100
+        } for result in agg_results]
 
 
 def extract_values_and_labels(elastic_results):
@@ -131,7 +138,7 @@ def extract_values_and_labels(elastic_results):
     for item in elastic_results:
         # import ipdb; ipdb.set_trace()
         labels.append(item['key'])
-        values.append(item['percent'])
+        values.append(item['value'])
 
     return values, labels
 
@@ -168,7 +175,12 @@ def create_bar_graph(elastic_results, terms, agg_type, x_label, title):
 
     plt.xticks(index + width / 2, labels, rotation='vertical')
     plt.xlabel(x_label)
-    plt.ylabel('Percent of Documents in Each Source')
+
+    if agg_type == 'Term':
+        plt.ylabel('Documents in Each Source')
+    else:
+        plt.ylabel('Percent of Documents in Each Source')
+
     plt.title(title)
     plt.tight_layout()
     plt.ylim(0, 100)
@@ -196,6 +208,7 @@ def main():
         agg_type = 'Missing'
         aggs.update(missing_agg_query(args.missing))
     if args.terms:
+        agg_type = 'Term'
         aggs.update(terms_agg_query(args.terms, args.size))
     if args.includes:
         agg_type = 'NotMissing'
@@ -212,7 +225,7 @@ def main():
     with open('figures/data/{}.json'.format(filename), 'w') as outfile:
         json.dump(results, outfile)
 
-    graph_variable = args.missing or args.includes
+    graph_variable = args.missing or args.includes or args.terms
 
     if args.bargraph:
         create_bar_graph(elastic_results=results, terms=graph_variable, agg_type=agg_type, x_label='terms', title='SHARE Results')
