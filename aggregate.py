@@ -93,7 +93,7 @@ def terms_agg_query(terms, size):
                 "field": term,
                 "size": size,
                 "exclude": "of|and|or",
-                "size": 0
+                "size": size
             }
         } for term in terms
     }
