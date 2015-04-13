@@ -144,9 +144,10 @@ def create_pie_chart(elastic_results, terms, agg_type, title):
     source_percents = full_results_to_list(elastic_results, terms, agg_type)
     values, labels = extract_values_and_labels(source_percents)
 
+    title = '{} {} {}'.format(title, agg_type, terms[0])
     plt.pie(values, labels=labels)
-    plt.title('{} {} {}'.format(title, agg_type, terms[0]))
-    plt.show()
+    plt.title(title)
+    plt.savefig(title + 'PieGraph')
 
 
 def create_bar_graph(elastic_results, terms, agg_type, x_label, title):
@@ -163,11 +164,16 @@ def create_bar_graph(elastic_results, terms, agg_type, x_label, title):
 
     plt.bar(index, values)
 
+    title = '{} {} {}'.format(title, agg_type, terms[0])
+
     plt.xticks(index + width / 2, labels, rotation='vertical')
     plt.xlabel(x_label)
     plt.ylabel('Percent of Documents in Each Source')
-    plt.title('{} {} {}'.format(title, agg_type, terms[0]))
-    plt.show()
+    plt.title(title)
+    plt.tight_layout()
+    plt.ylim(0, 100)
+    # plt.show(title + 'BarGraph', )
+    plt.savefig('figures/' + title.replace('SHARE Results ', '').replace(' ', '') + 'BarGraph')
 
 
 def parse_args():
@@ -198,6 +204,13 @@ def main():
     results = search(aggs)
 
     print(json.dumps(results, indent=4))
+
+    for agg in aggs.keys():
+        if agg != 'allSourceAgg':
+            filename = agg
+
+    with open('figures/data/{}.json'.format(filename), 'w') as outfile:
+        json.dump(results, outfile)
 
     graph_variable = args.missing or args.includes
 
