@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 # OSF_APP_URL = 'http://localhost:5000/api/v1/share/search/?raw=True'
 
 # production SHARE settings
-OSF_APP_URL = 'https://osf.io/api/v1/share/search/?raw=True'
+OSF_APP_URL = 'https://osf.io/api/v1/share/search/?raw=True&v=1'
 
 
 def query_osf(query):
@@ -24,6 +24,7 @@ def search(aggs):
         'size': 0,
         'aggs': aggs
     }
+
     osf_query = query_osf(query)
     return osf_query
 
@@ -32,15 +33,34 @@ def missing_agg_query(terms):
     return {
         "{}MissingAggregation".format(term): {
             "filter": {
-                "missing": {"field": term}
+                "query": {
+                    "query_string": {
+                        "query": "NOT {}:*".format(term)
+                    }
+                }
             },
-
             "aggs": {
                 "sources": {
-                    "terms": {"field": "source"}
+                    "terms": {
+                        "field": "source",
+                        "min_doc_count": 0,
+                        "size": 0
+                    }
                 }
             }
         } for term in terms
+    }
+
+
+def all_source_counts():
+    return {
+        "allSourceAgg": {
+            "terms": {
+                "field": "source",
+                "min_doc_count": 0,
+                "size": 0
+            }
+        }
     }
 
 
@@ -48,14 +68,18 @@ def includes_agg_query(terms):
     return {
         "{}NotMissingAggregation".format(term): {
             "filter": {
-                "not": {
-                    "missing": {"field": term}
+                "query": {
+                    "query_string": {
+                        "query": "{}:*".format(term)
+                    }
                 }
             },
-
             "aggs": {
                 "sources": {
-                    "terms": {"field": "source"}
+                    "terms": {
+                        "field": "source",
+                        "size": 0
+                    }
                 }
             }
         } for term in terms
@@ -68,7 +92,8 @@ def terms_agg_query(terms, size):
             "terms": {
                 "field": term,
                 "size": size,
-                "exclude": "of|and|or"
+                "exclude": "of|and|or",
+                "size": 0
             }
         } for term in terms
     }
@@ -79,10 +104,18 @@ def full_results_to_list(full_elastic_results, terms, agg_type):
     returns a simplified version with just a list of
     all the doc counts and their values '''
     term = terms[0]
-    try:
-        return full_elastic_results['aggregations']['sources']['buckets']
-    except KeyError:
-        return full_elastic_results['aggregations']['{}{}Aggregation'.format(term, agg_type)]['sources']['buckets']
+
+    agg_results = full_elastic_results['aggregations']['{}{}Aggregation'.format(term, agg_type)]['sources']['buckets']
+
+    source_counts = {
+        result['key']: result['doc_count']
+        for result in full_elastic_results['aggregations']['allSourceAgg']['buckets']
+    }
+
+    return [{
+        'key': result['key'],
+        'percent': float(result['doc_count']) / source_counts[result['key']] * 100
+    } for result in agg_results]
 
 
 def extract_values_and_labels(elastic_results):
@@ -96,8 +129,9 @@ def extract_values_and_labels(elastic_results):
     labels = []
     values = []
     for item in elastic_results:
+        # import ipdb; ipdb.set_trace()
         labels.append(item['key'])
-        values.append(item['doc_count'])
+        values.append(item['percent'])
 
     return values, labels
 
@@ -107,8 +141,8 @@ def create_pie_chart(elastic_results, terms, agg_type, title):
     returns a bar graph of the doc counts.
     Looks very messy at the moment - need to fix labels'''
 
-    simplified_elastic_results = full_results_to_list(elastic_results, terms, agg_type)
-    values, labels = extract_values_and_labels(simplified_elastic_results)
+    source_percents = full_results_to_list(elastic_results, terms, agg_type)
+    values, labels = extract_values_and_labels(source_percents)
 
     plt.pie(values, labels=labels)
     plt.title('{} {} {}'.format(title, agg_type, terms[0]))
@@ -118,8 +152,8 @@ def create_pie_chart(elastic_results, terms, agg_type, title):
 def create_bar_graph(elastic_results, terms, agg_type, x_label, title):
     ''' takes a list of elastic results, and
     returns a bar graph of the doc counts'''
-    simplified_elastic_results = full_results_to_list(elastic_results, terms, agg_type)
-    values, labels = extract_values_and_labels(simplified_elastic_results)
+    source_percents = full_results_to_list(elastic_results, terms, agg_type)
+    values, labels = extract_values_and_labels(source_percents)
 
     index = np.arange(len(values))
     width = 0.35
@@ -131,7 +165,7 @@ def create_bar_graph(elastic_results, terms, agg_type, x_label, title):
 
     plt.xticks(index + width / 2, labels, rotation='vertical')
     plt.xlabel(x_label)
-    plt.ylabel('Document Count')
+    plt.ylabel('Percent of Documents in Each Source')
     plt.title('{} {} {}'.format(title, agg_type, terms[0]))
     plt.show()
 
@@ -151,7 +185,7 @@ def parse_args():
 
 def main():
     args = parse_args()
-    aggs = {}
+    aggs = all_source_counts()
     if args.missing:
         agg_type = 'Missing'
         aggs.update(missing_agg_query(args.missing))
