@@ -5,8 +5,11 @@ usage: ```python aggregate.py [-h] [-m MISSING [MISSING ...]] [-t TERMS [TERMS .
 
 examples: 
 ```python aggregate.py -i description``` will generate percentages for all sources with descriptions
+
 ```python aggregate.py -m sponsor``` will generate percentages for all sources without sponsors
+
 ```python aggregate.py -t tags -s 10``` will generate top 10 list for elements with that name
+
 ```python aggregate.py -t tags -v 1 -s 10``` will gennerate top 10 list for elements using v1 of the schema
 
 ```
