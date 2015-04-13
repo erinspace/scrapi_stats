@@ -184,6 +184,18 @@ def create_bar_graph(elastic_results, terms, agg_type, x_label, title):
     # plt.show(title + 'BarGraph', )
     plt.savefig('figures/' + title.replace('SHARE Results ', '').replace(' ', '') + 'BarGraph')
 
+def create_bubble(results):
+    tags = results['aggregations']['tagsTermFilter']['buckets']
+    x = list(range(len(tags)))
+    y, z = np.random.rand(2, len(tags))
+    s = []
+    for tag in tags:
+        s.append(tag['doc_count'])
+
+    fig, ax = plt.subplots()
+    sc = ax.scatter(x, y, s=s, c=z)
+    ax.grid()
+    plt.show()
 
 def create_histogram(elastic_results, terms, agg_type, title):
     source_percents = full_results_to_list(elastic_results, terms, agg_type)
@@ -218,6 +230,7 @@ def parse_args():
     parser.add_argument('-b', '--bargraph', dest='bargraph', help='A flag to signal to draw a bar graph', action='store_true')
     parser.add_argument('-p', '--piegraph', dest='piegraph', help='A flag to signal to draw a pie graph', action='store_true')
     parser.add_argument('-hist', '--histogram', dest='histogram', help='A flag to signal to draw a histogram', action='store_true')
+    parser.add_argument('-bub', '--bubblechart', dest='bubblechart', help='A flag to signal to draw a bubblechart', action='store_true')
 
     return parser.parse_args()
 
@@ -256,7 +269,8 @@ def main():
         create_pie_chart(results, terms=graph_variable, agg_type=agg_type, title='SHARE Results')
     if args.histogram:
         create_histogram(results, terms=graph_variable, agg_type=agg_type, title='SHARE Results')
-
+    if args.bubblechart and 'tags' in args.terms:
+        create_bubble(results)
 
 if __name__ == '__main__':
     main()
