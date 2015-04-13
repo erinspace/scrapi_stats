@@ -1,7 +1,7 @@
 # SHARE Stats
 
-usage: aggregate.py [-h] [-m MISSING [MISSING ...]] [-t TERMS [TERMS ...]]
-                    [-s SIZE] [-i INCLUDES [INCLUDES ...]] [-b] [-p]
+usage: ```python aggregate.py [-h] [-m MISSING [MISSING ...]] [-t TERMS [TERMS ...]]
+                    [-s SIZE] [-i INCLUDES [INCLUDES ...]] [-b] [-p]```
 
 examples: 
 ```python aggregate.py -i description``` will generate percentages for all sources with descriptions
