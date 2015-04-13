@@ -169,6 +169,18 @@ def create_bar_graph(elastic_results, terms, agg_type, x_label, title):
     plt.title('{} {} {}'.format(title, agg_type, terms[0]))
     plt.show()
 
+def create_bubble(results):
+    tags = results['aggregations']['tagsTermFilter']['buckets']
+    x = list(range(len(tags)))
+    y, z = np.random.rand(2, len(tags))
+    s = []
+    for tag in tags:
+        s.append(tag['doc_count'])
+
+    fig, ax = plt.subplots()
+    sc = ax.scatter(x, y, s=s, c=z)
+    ax.grid()
+    plt.show()
 
 def parse_args():
     parser = argparse.ArgumentParser(description="A command line interface for getting numbers of SHARE sources missing given terms")
@@ -179,6 +191,7 @@ def parse_args():
     parser.add_argument('-i', '--includes', dest='includes', type=str, help='The terms to aggregate with, to find sources with terms included', nargs='+')
     parser.add_argument('-b', '--bargraph', dest='bargraph', help='A flag to signal to draw a bar graph', action='store_true')
     parser.add_argument('-p', '--piegraph', dest='piegraph', help='A flag to signal to draw a pie graph', action='store_true')
+    parser.add_argument('-bub', '--bubblechart', dest='bubblechart', help='A flag to signal to draw a bubblechart', action='store_true')
 
     return parser.parse_args()
 
@@ -197,7 +210,7 @@ def main():
 
     results = search(aggs)
 
-    print(json.dumps(results, indent=4))
+    # print(json.dumps(results, indent=4))
 
     graph_variable = args.missing or args.includes
 
@@ -205,7 +218,8 @@ def main():
         create_bar_graph(elastic_results=results, terms=graph_variable, agg_type=agg_type, x_label='terms', title='SHARE Results')
     if args.piegraph:
         create_pie_chart(results, terms=graph_variable, agg_type=agg_type, title='SHARE Results')
-
+    if args.bubblechart and 'tags' in args.terms:
+        create_bubble(results)
 
 if __name__ == '__main__':
     main()
