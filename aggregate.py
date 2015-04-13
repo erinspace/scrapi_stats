@@ -136,7 +136,6 @@ def extract_values_and_labels(elastic_results):
     labels = []
     values = []
     for item in elastic_results:
-        # import ipdb; ipdb.set_trace()
         labels.append(item['key'])
         values.append(item['value'])
 
