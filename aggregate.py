@@ -210,7 +210,7 @@ def main():
 
     results = search(aggs)
 
-    # print(json.dumps(results, indent=4))
+    print(json.dumps(results, indent=4))
 
     graph_variable = args.missing or args.includes
 
