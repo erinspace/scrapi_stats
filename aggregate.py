@@ -66,7 +66,7 @@ def all_source_counts():
 
 def includes_agg_query(terms):
     return {
-        "{}NotMissingAggregation".format(term): {
+        "{}IncludedAggregation".format(term): {
             "filter": {
                 "query": {
                     "query_string": {
@@ -165,9 +165,6 @@ def create_bar_graph(elastic_results, terms, agg_type, x_label, title):
     index = np.arange(len(values))
     width = 0.35
 
-    if agg_type == 'NotMissing':
-        agg_type = 'Including'
-
     plt.bar(index, values)
 
     title = '{} {} {}'.format(title, agg_type, terms[0])
@@ -200,6 +197,28 @@ def create_bubble(results):
     ax.grid()
     plt.show()
 
+def create_histogram(elastic_results, terms, agg_type, title):
+    source_percents = full_results_to_list(elastic_results, terms, agg_type)
+    values, labels = extract_values_and_labels(source_percents)
+
+    index = np.arange(len(values))
+    width = 0.35
+
+    plt.hist(values, label=labels)
+
+    title = '{} {} {}'.format(title, agg_type, terms[0])
+
+    plt.xlim(0, 100)
+
+    plt.ylabel('Frequency (Number of Providers)')
+
+    plt.xlabel('Percent {}'.format(agg_type))
+    plt.title(title)
+    plt.tight_layout()
+    plt.savefig('figures/' + title.replace('SHARE Results ', '').replace(' ', '') + 'Histogram')
+
+
+
 def parse_args():
     parser = argparse.ArgumentParser(description="A command line interface for getting numbers of SHARE sources missing given terms")
 
@@ -210,6 +229,7 @@ def parse_args():
     parser.add_argument('-i', '--includes', dest='includes', type=str, help='The terms to aggregate with, to find sources with terms included', nargs='+')
     parser.add_argument('-b', '--bargraph', dest='bargraph', help='A flag to signal to draw a bar graph', action='store_true')
     parser.add_argument('-p', '--piegraph', dest='piegraph', help='A flag to signal to draw a pie graph', action='store_true')
+    parser.add_argument('-hist', '--histogram', dest='histogram', help='A flag to signal to draw a histogram', action='store_true')
     parser.add_argument('-bub', '--bubblechart', dest='bubblechart', help='A flag to signal to draw a bubblechart', action='store_true')
 
     return parser.parse_args()
@@ -225,7 +245,7 @@ def main():
         agg_type = 'Term'
         aggs.update(terms_agg_query(args.terms, args.size))
     if args.includes:
-        agg_type = 'NotMissing'
+        agg_type = 'Included'
         aggs.update(includes_agg_query(args.includes))
 
     url = OSF_APP_URL.format(args.v)
@@ -247,6 +267,8 @@ def main():
         create_bar_graph(elastic_results=results, terms=graph_variable, agg_type=agg_type, x_label='terms', title='SHARE Results')
     if args.piegraph:
         create_pie_chart(results, terms=graph_variable, agg_type=agg_type, title='SHARE Results')
+    if args.histogram:
+        create_histogram(results, terms=graph_variable, agg_type=agg_type, title='SHARE Results')
     if args.bubblechart and 'tags' in args.terms:
         create_bubble(results)
 
