@@ -3,7 +3,7 @@ from __future__ import division
 import json
 import operator
 import requests
-import numpy as np 
+import numpy as np
 from collections import Counter
 import matplotlib.pyplot as plt
 
@@ -16,7 +16,7 @@ with open('data.json', 'r') as raw:
 
 
 def large_dot_plot():
-    fields = [] 
+    fields = []
     num_sources = []
     count = []
 
@@ -34,7 +34,7 @@ def large_dot_plot():
 
 
 def top_fields():
-    fields = [] 
+    fields = []
     num_sources = []
     count = []
 
@@ -60,9 +60,9 @@ def top_fields():
 
 
 def fields_from_raw(percents=True):
-    ''' percents is used later on to determine the output of the  function. 
-    If True, it returns a percentage from that source that have each field. 
-    If False, it returns the raw numbers 
+    ''' percents is used later on to determine the output of the  function.
+    If True, it returns a percentage from that source that have each field.
+    If False, it returns the raw numbers
     '''
 
     fields = {}
@@ -90,7 +90,7 @@ def fields_from_raw(percents=True):
     '''
 
     fields['all_source_count'] = Counter(fields['all_source_count_list'])
-    import pdb; pdb.set_trace()
+    # import pdb; pdb.set_trace()
     del fields['all_source_count_list']
 
     for field, value in fields.iteritems():
@@ -105,7 +105,7 @@ def fields_from_raw(percents=True):
                 if percents:
                     value['source_percent'][source] = round((number/value['count'], 2)*100)
                     value['percent_field_with_source'][source] = round((number/fields['all_source_count'][source], 2)*100)
-                else: 
+                else:
                     value['source_percent'][source] = '{}/{}'.format(number, value['count'])
                     value['percent_field_with_source'][source] = '{}/{}'.format(number, fields['all_source_count'][source])
 
@@ -118,6 +118,7 @@ def fields_from_raw(percents=True):
 
     return field_source_percents
 
+
 def fields_data():
     source_percents = fields_from_raw(percents=False)
 
@@ -126,8 +127,7 @@ def fields_data():
 fields_data()
 
 # fields_from_raw()
- 
+
 # top_fields()
 
 # large_dot_plot()
-

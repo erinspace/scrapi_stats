@@ -197,6 +197,7 @@ def create_bubble(results):
     ax.grid()
     plt.show()
 
+
 def create_histogram(elastic_results, terms, agg_type, title):
     source_percents = full_results_to_list(elastic_results, terms, agg_type)
     values, labels = extract_values_and_labels(source_percents)
@@ -216,7 +217,6 @@ def create_histogram(elastic_results, terms, agg_type, title):
     plt.title(title)
     plt.tight_layout()
     plt.savefig('figures/' + title.replace('SHARE Results ', '').replace(' ', '') + 'Histogram')
-
 
 
 def parse_args():
