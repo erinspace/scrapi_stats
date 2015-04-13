@@ -1,18 +1,10 @@
 # SHARE Stats
 
-usage: ```python aggregate.py [-h] [-m MISSING [MISSING ...]] [-t TERMS [TERMS ...]]
-                    [-s SIZE] [-i INCLUDES [INCLUDES ...]] [-b] [-p]```
-
-examples: 
-```python aggregate.py -i description``` will generate percentages for all sources with descriptions
-
-```python aggregate.py -m sponsor``` will generate percentages for all sources without sponsors
-
-```python aggregate.py -t tags -s 10``` will generate top 10 list for elements with that name
-
-```python aggregate.py -t tags -v 1 -s 10``` will gennerate top 10 list for elements using v1 of the schema
-
 ```
+usage: aggregate.py [-h] [-m MISSING [MISSING ...]] [-t TERMS [TERMS ...]]
+                    [-s SIZE] [-v V] [-i INCLUDES [INCLUDES ...]] [-b] [-p]
+                    [-hist] [-bub]
+
 A command line interface for getting numbers of SHARE sources missing given
 terms
 
@@ -31,5 +23,18 @@ optional arguments:
                         terms included
   -b, --bargraph        A flag to signal to draw a bar graph
   -p, --piegraph        A flag to signal to draw a pie graph
+  -hist, --histogram    A flag to signal to draw a histogram
+  -bub, --bubblechart   A flag to signal to draw a bubblechart
   
 ```
+
+examples: 
+```python aggregate.py -i description``` will generate percentages for all sources with descriptions
+
+```python aggregate.py -m sponsor``` will generate percentages for all sources without sponsors
+
+```python aggregate.py -t tags -s 10``` will generate top 10 list for elements with that name
+
+```python aggregate.py -t tags -v 1 -s 10``` will gennerate top 10 list for elements using v1 of the schema
+
+```python aggregate.py -t tags -s 10``` will generate top 10 tags as an (for now unlabeled) bubble chart
