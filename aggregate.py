@@ -3,6 +3,7 @@ from __future__ import division
 import json
 import argparse
 import requests
+from datetime import date
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -12,6 +13,24 @@ import matplotlib.pyplot as plt
 
 # production SHARE settings
 OSF_APP_URL = 'https://osf.io/api/v1/share/search/?raw=True&v={}'
+
+
+FRONTEND_KEYS = [
+    "uris",
+    "contributors",
+    "providerUpdatedDateTime",
+    "description",
+    "title",
+    "freeToRead",
+    "languages",
+    "licenses",
+    "publisher",
+    "subjects",
+    "tags",
+    "sponsorships",
+    "otherProperties",
+    "shareProperties"
+]
 
 
 def query_osf(url, query):
@@ -236,6 +255,7 @@ def parse_args():
 
 
 def main():
+    today = date.today().isoformat()
     args = parse_args()
     aggs = all_source_counts()
     if args.missing:
@@ -264,11 +284,11 @@ def main():
     graph_variable = args.missing or args.includes or args.terms
 
     if args.bargraph:
-        create_bar_graph(elastic_results=results, terms=graph_variable, agg_type=agg_type, x_label='terms', title='SHARE Results')
+        create_bar_graph(elastic_results=results, terms=graph_variable, agg_type=agg_type, x_label='terms', title='SHARE Results as of {}'.format(today))
     if args.piegraph:
-        create_pie_chart(results, terms=graph_variable, agg_type=agg_type, title='SHARE Results')
+        create_pie_chart(results, terms=graph_variable, agg_type=agg_type, title='SHARE Results as of {}'.format(today))
     if args.histogram:
-        create_histogram(results, terms=graph_variable, agg_type=agg_type, title='SHARE Results')
+        create_histogram(results, terms=graph_variable, agg_type=agg_type, title='SHARE Results as of {}'.format(today))
     if args.bubblechart and 'tags' in args.terms:
         create_bubble(results)
 
